@@ -5,12 +5,12 @@ A modern, responsive portfolio website built with Node.js, Express, and vanilla 
 ## Features
 
 - **Responsive Design**: Mobile-first approach with clean, modern styling
-- **Multiple Sections**: 
+- **Multiple Sections**:
   - Career timeline and achievements
   - Developer community involvement
   - Digital interaction projects
   - Analog artwork gallery
-- **Interactive Elements**: 
+- **Interactive Elements**:
   - Project filtering
   - Art gallery categories
   - Smooth animations
@@ -60,17 +60,20 @@ portfolio-website/
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    cd portfolio-website
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    ```

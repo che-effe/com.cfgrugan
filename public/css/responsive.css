@@ -144,6 +144,19 @@
     .bio-highlights {
         grid-template-columns: 1fr;
     }
+    
+    /* Articles Page Mobile */
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .articles-filter {
+        justify-content: flex-start;
+    }
+    
+    .articles-cta {
+        padding: var(--spacing-lg);
+    }
 }
 
 /* Mobile Styles */

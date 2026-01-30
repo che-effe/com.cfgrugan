@@ -54,6 +54,31 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Article Filtering (Articles Page)
+    const articleFilterButtons = document.querySelectorAll('.articles-filter .filter-btn');
+    const articleCards = document.querySelectorAll('.article-card');
+
+    articleFilterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+
+            // Update active button
+            articleFilterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter articles
+            articleCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                if (filter === 'all' || category === filter) {
+                    card.style.display = 'flex';
+                    card.style.animation = 'fadeIn 0.5s ease-in-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
     // Art Category Filtering (Analog Art Page)
     const categoryButtons = document.querySelectorAll('.category-btn');
     const galleryItems = document.querySelectorAll('.gallery-item');

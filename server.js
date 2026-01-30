@@ -54,6 +54,13 @@ app.get('/bio', (req, res) => {
     });
 });
 
+app.get('/articles', (req, res) => {
+    res.render('articles', {
+        title: 'Articles & Writing',
+        page: 'articles'
+    });
+});
+
 // Error handling
 app.use((req, res) => {
     res.status(404).render('404', {
