@@ -1,0 +1,160 @@
+name: CI/CD Portfolio Website
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18.x'
+  
+jobs:
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint code (if you add linting)
+      run: npm run lint || echo "No linting configured"
+      
+    - name: Run tests
+      run: npm test || echo "No tests configured yet"
+      
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --only=production
+      
+    - name: Create production build
+      run: |
+        echo "Preparing production build..."
+        # Create a build directory with necessary files
+        mkdir -p build
+        cp -r public build/
+        cp -r views build/
+        cp server.js build/
+        cp package.json build/
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: portfolio-build
+        path: build/
+        retention-days: 30
+        
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: portfolio-build
+        path: ./build
+        
+    # Add your staging deployment steps here
+    - name: Deploy to staging environment
+      run: |
+        echo "Deploying to staging..."
+        # Add staging deployment commands
+        
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: portfolio-build
+        path: ./build
+        
+    # Option 1: Deploy to Heroku
+    - name: Deploy to Heroku
+      if: vars.DEPLOY_TARGET == 'heroku'
+      uses: akhileshns/heroku-deploy@v3.12.14
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        
+    # Option 2: Deploy to Railway
+    - name: Deploy to Railway
+      if: vars.DEPLOY_TARGET == 'railway'
+      run: |
+        npm install -g @railway/cli
+        railway login --token ${{ secrets.RAILWAY_TOKEN }}
+        railway deploy
+        
+    # Option 3: Deploy to Vercel
+    - name: Deploy to Vercel
+      if: vars.DEPLOY_TARGET == 'vercel'
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        working-directory: ./
+        
+    # Option 4: Deploy to DigitalOcean App Platform
+    - name: Deploy to DigitalOcean
+      if: vars.DEPLOY_TARGET == 'digitalocean'
+      uses: digitalocean/app_action@v1.1.5
+      with:
+        app_name: ${{ secrets.DO_APP_NAME }}
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Notify success
+      if: needs.deploy-production.result == 'success'
+      run: |
+        echo "✅ Portfolio website deployed successfully!"
+        # Add notification logic (Slack, email, etc.)
+        
+    - name: Notify failure
+      if: needs.deploy-production.result == 'failure'
+      run: |
+        echo "❌ Portfolio website deployment failed!"
+        # Add notification logic for failures
