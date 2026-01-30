@@ -1,0 +1,78 @@
+name: Build and Deploy Portfolio
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests (if any)
+      run: npm test || true
+      
+    - name: Build application
+      run: |
+        echo "Building portfolio application..."
+        # For a production build, you might want to:
+        # - Minify CSS/JS
+        # - Optimize images
+        # - Bundle assets
+        # Since this is a simple Express app, we'll just prepare the files
+        
+    - name: Deploy to GitHub Pages (Optional)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
+        # Note: This deploys static files only. For full Express app deployment,
+        # consider using services like Heroku, Vercel, or Railway
+        
+    # Alternative deployment options:
+    
+    # Deploy to Heroku
+    # - name: Deploy to Heroku
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   uses: akhileshns/heroku-deploy@v3.12.14
+    #   with:
+    #     heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+    #     heroku_app_name: "your-portfolio-app"
+    #     heroku_email: "your-email@example.com"
+        
+    # Deploy to Railway
+    # - name: Deploy to Railway
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   uses: bervProject/railway-deploy@v1.2.0
+    #   with:
+    #     railway_token: ${{ secrets.RAILWAY_TOKEN }}
+    #     service: "portfolio-website"
+        
+    # Deploy to Vercel
+    # - name: Deploy to Vercel
+    #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    #   uses: amondnet/vercel-action@v25
+    #   with:
+    #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+    #     vercel-org-id: ${{ secrets.ORG_ID }}
+    #     vercel-project-id: ${{ secrets.PROJECT_ID }}
+    #     working-directory: ./
