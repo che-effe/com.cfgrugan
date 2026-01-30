@@ -1,26 +1,43 @@
 {
-  "name": "portfolio-website",
+  "name": "christopher-grugan-portfolio",
   "version": "1.0.0",
-  "description": "Personal portfolio website showcasing career achievements, dev community involvement, digital work, and analog art",
-  "main": "server.js",
+  "description": "Christopher Grugan's Portfolio Website - Full Stack Developer & Digital Artist",
+  "main": "index.html",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "python3 -m http.server 8000",
+    "build": "node scripts/build.js",
+    "preview": "cd dist && python3 -m http.server 8000",
+    "clean": "rm -rf dist",
+    "deploy": "npm run build && gh-pages -d dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "portfolio",
-    "website",
-    "express",
-    "nodejs"
+    "full-stack-developer",
+    "digital-artist",
+    "web-development",
+    "javascript",
+    "css",
+    "html",
+    "github-pages"
   ],
-  "author": "Your Name",
+  "author": "Christopher Grugan",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/che-effe/com.cfgrugan.git"
+  },
+  "homepage": "https://che-effe.github.io/com.cfgrugan/",
   "dependencies": {
     "express": "^4.18.2",
     "ejs": "^3.1.9"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "gh-pages": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
